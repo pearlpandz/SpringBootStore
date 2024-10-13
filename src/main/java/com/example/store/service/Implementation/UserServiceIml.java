@@ -1,9 +1,14 @@
 package com.example.store.service.Implementation;
 
 import com.example.store.entity.User;
+import com.example.store.payload.LoginRequest;
 import com.example.store.repository.UserRepository;
 import com.example.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +20,10 @@ public class UserServiceIml implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
     @Autowired
-    private PasswordEncoder encoder;
+    private AuthenticationManager authenticationManager;
 
     public List<User> getAllUsers() {
         return (List<User>) userRepository.findAll();
@@ -29,7 +36,7 @@ public class UserServiceIml implements UserService {
 
     @Override
     public User updateUser(User user) {
-        user.setPassword(encoder.encode((user.getPassword())));
+        user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -48,4 +55,15 @@ public class UserServiceIml implements UserService {
         }
         return deletedUser;
     }
+
+    @Override
+    public String verify(LoginRequest payload) {
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(payload.getEmail(), payload.getPassword()));
+        if(authentication.isAuthenticated()) {
+            return "Success";
+        }
+        return "Failed";
+    }
+
 }
