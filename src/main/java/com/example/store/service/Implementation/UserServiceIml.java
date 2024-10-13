@@ -4,6 +4,7 @@ import com.example.store.entity.User;
 import com.example.store.repository.UserRepository;
 import com.example.store.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,9 @@ public class UserServiceIml implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     public List<User> getAllUsers() {
         return (List<User>) userRepository.findAll();
@@ -25,6 +29,7 @@ public class UserServiceIml implements UserService {
 
     @Override
     public User updateUser(User user) {
+        user.setPassword(encoder.encode((user.getPassword())));
         return userRepository.save(user);
     }
 
