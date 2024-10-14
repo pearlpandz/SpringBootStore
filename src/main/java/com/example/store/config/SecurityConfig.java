@@ -32,7 +32,7 @@ public class SecurityConfig {
             .csrf()
                 .disable() // by default methods are disabled except GET. it will enable to access all methods
             .authorizeHttpRequests()
-                .requestMatchers("/**").permitAll().anyRequest().authenticated();
+                .requestMatchers("/auth/**").permitAll().anyRequest().authenticated();
         return http.build();
     }
 

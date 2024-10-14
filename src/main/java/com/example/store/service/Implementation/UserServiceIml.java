@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +19,13 @@ public class UserServiceIml implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JWTService jwtService;
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public List<User> getAllUsers() {
         return (List<User>) userRepository.findAll();
@@ -59,11 +61,12 @@ public class UserServiceIml implements UserService {
     @Override
     public String verify(LoginRequest payload) {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(payload.getEmail(), payload.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(payload.getUsername(), payload.getPassword()));
         if(authentication.isAuthenticated()) {
-            return "Success";
+            String token = jwtService.generateToken(payload.getUsername());
+            return token;
         }
-        return "Failed";
+        return "Unauthorised!";
     }
 
 }
