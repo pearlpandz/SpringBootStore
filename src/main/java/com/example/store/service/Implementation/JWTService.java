@@ -3,6 +3,9 @@ package com.example.store.service.Implementation;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -47,8 +50,23 @@ public class JWTService {
                 .compact();
     }
 
-    public Boolean validateToken() {
+    public Boolean validateToken(String token, UserDetails userDetails) {
         return true;
     }
 
+    public String extractUsernameFromToken(String token) {
+        return "pearlpandz";
+    }
+
+    public String extractTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for (Cookie cookie: cookies) {
+                if(cookie.getName().equals("JWT_TOKEN")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return "NOT_FOUND";
+    }
 }

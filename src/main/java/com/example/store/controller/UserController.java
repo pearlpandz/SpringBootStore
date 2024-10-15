@@ -45,7 +45,6 @@ public class UserController {
         List<User> users = null;
         try {
             users = userService.getAllUsers();
-            System.out.println(users);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
